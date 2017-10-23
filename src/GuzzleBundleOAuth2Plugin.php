@@ -4,14 +4,15 @@ namespace Gregurco\Bundle\GuzzleBundleOAuth2Plugin;
 
 
 use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
-use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
-use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
+use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GrantType\PasswordCredentials;
+use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GrantType\RefreshToken;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Sainsburys\Guzzle\Oauth2\Middleware\OAuthMiddleware;
+use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\Middleware\OAuthMiddleware;
 use GuzzleHttp\Client;
 
 class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundlePlugin
@@ -51,21 +52,21 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
             // Define password credentials
             $passwordCredentialsDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.password_credentials.%s', $clientName);
             $passwordCredentialsDefinition = new Definition(PasswordCredentials::class);
-            $passwordCredentialsDefinition->addArgument($oauthClientDefinitionName);
+            $passwordCredentialsDefinition->addArgument(new Reference($oauthClientDefinitionName));
             $passwordCredentialsDefinition->addArgument($middlewareConfig);
             $container->setDefinition($passwordCredentialsDefinitionName, $passwordCredentialsDefinition);
 
             // Define refresh token
             $refreshTokenDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.refresh_token.%s', $clientName);
             $refreshTokenDefinition = new Definition(RefreshToken::class);
-            $refreshTokenDefinition->addArgument($oauthClientDefinitionName);
+            $refreshTokenDefinition->addArgument(new Reference($oauthClientDefinitionName));
             $refreshTokenDefinition->addArgument($middlewareConfig);
             $container->setDefinition($refreshTokenDefinitionName, $refreshTokenDefinition);
 
             //Define middleware
             $oAuth2MiddlewareDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.middleware.%s', $clientName);
             $oAuth2MiddlewareDefinition = new Definition(OAuthMiddleware::class);
-            $oAuth2MiddlewareDefinition->setArguments([$oauthClientDefinitionName, $passwordCredentialsDefinitionName, $refreshTokenDefinitionName]);
+            $oAuth2MiddlewareDefinition->setArguments([new Reference($oauthClientDefinitionName), new Reference($passwordCredentialsDefinitionName), new Reference($refreshTokenDefinitionName)]);
             $container->setDefinition($oAuth2MiddlewareDefinitionName, $oAuth2MiddlewareDefinition);
 
             $onBeforeExpression = new Expression(sprintf('service("%s").onBefore()', $oAuth2MiddlewareDefinitionName));
