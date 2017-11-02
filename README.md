@@ -1,22 +1,22 @@
-Guzzle Bundle OAuth2 Plugin
-==================
+# Guzzle Bundle OAuth2 Plugin
+
 
 [![Build Status](https://travis-ci.org/gregurco/GuzzleBundleOAuth2Plugin.svg?branch=master)](https://travis-ci.org/gregurco/GuzzleBundleOAuth2Plugin) [![Coverage Status](https://coveralls.io/repos/gregurco/GuzzleBundleOAuth2Plugin/badge.svg?branch=master)](https://coveralls.io/r/gregurco/GuzzleBundleOAuth2Plugin)
 
 This plugin integrates [OAuth2][1] functionality into Guzzle Bundle, a bundle for building RESTful web service clients.
 
 
-Requirements
+## Requirements
 ------------
  - PHP 7.0 or above
  - [Guzzle Bundle][2]
  - [guzzle-oauth2-plugin][3]
 
  
-Installation
-------------
-Using [composer][4]:
+## Installation
+Using [composer][3]:
 
+##### composer.json
 ``` json
 {
     "require": {
@@ -25,26 +25,30 @@ Using [composer][4]:
 }
 ```
 
+##### command line
+``` bash
+$ composer require gregurco/guzzle-bundle-oauth2-plugin
+```
 
-Usage
------
-Load plugin in AppKernel.php:
+## Usage
+### Enable bundle
 ``` php
+# app/AppKernel.php
+
 new EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundle([
     new Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GuzzleBundleOAuth2Plugin(),
 ])
-```
 
-Configuration in config.yml:
+### Basic configuration
 ``` yaml
+# app/config/config.yml
+
 eight_points_guzzle:
     clients:
         api_payment:
             base_url: "http://api.domain.tld"
             
             auth: oauth2
-
-            # define headers, options
 
             # plugin settings
             plugin:
@@ -58,8 +62,7 @@ eight_points_guzzle:
                     scope:          "administration"
 ```
 
-License
--------
+## License
 This middleware is licensed under the MIT License - see the LICENSE file for details
 
 [1]: http://www.xml.com/pub/a/2003/12/17/dive.html
