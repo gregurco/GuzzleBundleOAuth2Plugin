@@ -10,11 +10,12 @@ Requirements
 ------------
  - PHP 7.0 or above
  - [Guzzle Bundle][2]
+ - [guzzle-oauth2-plugin][3]
 
  
 Installation
 ------------
-Using [composer][3]:
+Using [composer][4]:
 
 ``` json
 {
@@ -40,18 +41,21 @@ eight_points_guzzle:
     clients:
         api_payment:
             base_url: "http://api.domain.tld"
+            
+            auth: oauth2
 
             # define headers, options
 
             # plugin settings
             plugin:
                 oauth2:
-                    url:        "https://example.com"
-                    username:   "test@example.com"
-                    password:   "pa55w0rd"
-                    client_id:  "test-client"
-                    token_url:  "/oauth/token"
-                    scope:      "administration"
+                    base_uri:       "https://example.com"
+                    token_url:      "/oauth/token"
+                    username:       "test@example.com"
+                    password:       "pa55w0rd"
+                    client_id:      "test-client-id"
+                    client_secret:  "test-client-secret"
+                    scope:          "administration"
 ```
 
 License
@@ -60,4 +64,5 @@ This middleware is licensed under the MIT License - see the LICENSE file for det
 
 [1]: http://www.xml.com/pub/a/2003/12/17/dive.html
 [2]: https://github.com/8p/EightPointsGuzzleBundle
-[3]: https://getcomposer.org/
+[3]: https://github.com/Sainsburys/guzzle-oauth2-plugin
+[4]: https://getcomposer.org/

@@ -3,16 +3,16 @@
 namespace Gregurco\Bundle\GuzzleBundleOAuth2Plugin;
 
 
+use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\DependencyInjection\GuzzleOAuth2Extension;
 use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
-use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GrantType\PasswordCredentials;
-use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GrantType\RefreshToken;
+use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
+use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\Middleware\OAuthMiddleware;
 use GuzzleHttp\Client;
 
 class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundlePlugin
@@ -23,7 +23,8 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-
+        $extension = new GuzzleOAuth2Extension();
+        $extension->load($configs, $container);
     }
 
     /**
@@ -34,19 +35,20 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
      */
     public function loadForClient(array $config, ContainerBuilder $container, string $clientName, Definition $handler)
     {
-        if ($config['username'] && $config['password']) {
+        if ($config['enabled']) {
             $middlewareConfig = [
                 PasswordCredentials::CONFIG_USERNAME => $config['username'],
                 PasswordCredentials::CONFIG_PASSWORD => $config['password'],
                 PasswordCredentials::CONFIG_CLIENT_ID => $config['client_id'],
+                PasswordCredentials::CONFIG_CLIENT_SECRET => $config['client_secret'],
                 PasswordCredentials::CONFIG_TOKEN_URL => $config['token_url'],
                 'scope' => $config['scope'],
             ];
 
             // Define Client
-            $oauthClientDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.client.%s', $clientName);
+            $oauthClientDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.middleware.%s', $clientName);
             $oauthClientDefinition = new Definition(Client::class);
-            $oauthClientDefinition->addArgument(['base_uri' => $config['url']]);
+            $oauthClientDefinition->addArgument(['base_uri' => $config['base_uri']]);
             $container->setDefinition($oauthClientDefinitionName, $oauthClientDefinition);
 
             // Define password credentials
@@ -65,8 +67,12 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
 
             //Define middleware
             $oAuth2MiddlewareDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.middleware.%s', $clientName);
-            $oAuth2MiddlewareDefinition = new Definition(OAuthMiddleware::class);
-            $oAuth2MiddlewareDefinition->setArguments([new Reference($oauthClientDefinitionName), new Reference($passwordCredentialsDefinitionName), new Reference($refreshTokenDefinitionName)]);
+            $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.middleware.class%');
+            $oAuth2MiddlewareDefinition->setArguments([
+                new Reference($oauthClientDefinitionName),
+                new Reference($passwordCredentialsDefinitionName),
+                new Reference($refreshTokenDefinitionName)
+            ]);
             $container->setDefinition($oAuth2MiddlewareDefinitionName, $oAuth2MiddlewareDefinition);
 
             $onBeforeExpression = new Expression(sprintf('service("%s").onBefore()', $oAuth2MiddlewareDefinitionName));
@@ -83,12 +89,13 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
     public function addConfiguration(ArrayNodeDefinition $pluginNode)
     {
         $pluginNode
-            ->addDefaultsIfNotSet()
+            ->canBeEnabled()
             ->children()
-                ->scalarNode('url')->defaultNull()->end()
+                ->scalarNode('base_uri')->defaultNull()->end()
                 ->scalarNode('username')->defaultNull()->end()
                 ->scalarNode('password')->defaultNull()->end()
                 ->scalarNode('client_id')->defaultNull()->end()
+                ->scalarNode('client_secret')->defaultNull()->end()
                 ->scalarNode('token_url')->defaultNull()->end()
                 ->scalarNode('scope')->defaultNull()->end()
             ->end();
