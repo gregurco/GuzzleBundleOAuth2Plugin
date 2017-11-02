@@ -38,6 +38,7 @@ $ composer require gregurco/guzzle-bundle-oauth2-plugin
 new EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundle([
     new Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GuzzleBundleOAuth2Plugin(),
 ])
+```
 
 ### Basic configuration
 ``` yaml
