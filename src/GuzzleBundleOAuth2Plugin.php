@@ -3,7 +3,7 @@
 namespace Gregurco\Bundle\GuzzleBundleOAuth2Plugin;
 
 
-use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\DependencyInjection\GuzzleOAuth2Extension;
+use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\DependencyInjection\GuzzleBundleOAuth2Extension;
 use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
@@ -23,7 +23,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $extension = new GuzzleOAuth2Extension();
+        $extension = new GuzzleBundleOAuth2Extension();
         $extension->load($configs, $container);
     }
 

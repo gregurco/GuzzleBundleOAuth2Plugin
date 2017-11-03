@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class GuzzleOAuth2Extension extends Extension
+class GuzzleBundleOAuth2Extension extends Extension
 {
     /**
      * @param array $configs
