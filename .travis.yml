@@ -1,0 +1,32 @@
+language: php
+
+sudo: false
+
+php:
+    - 7.0
+    - 7.1
+
+env:
+    - SYMFONY_VERSION=3.2.*
+    - SYMFONY_VERSION=3.3.*
+
+cache:
+    directories:
+        - $HOME/.composer/cache/files
+
+before_install:
+    - composer self-update
+
+install:
+    - composer install
+
+script:
+    - mkdir -p build/logs
+    - php vendor/bin/phpunit -c phpunit.xml.dist --coverage-text
+
+after_success:
+  - travis_retry php vendor/bin/coveralls
+
+notifications:
+    email:
+        - "gregurco.vlad@gmail.com"
