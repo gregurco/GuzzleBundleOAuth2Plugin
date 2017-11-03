@@ -46,14 +46,14 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
             ];
 
             // Define Client
-            $oauthClientDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.middleware.%s', $clientName);
+            $oauthClientDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.client.%s', $clientName);
             $oauthClientDefinition = new Definition(Client::class);
             $oauthClientDefinition->addArgument(['base_uri' => $config['base_uri']]);
             $container->setDefinition($oauthClientDefinitionName, $oauthClientDefinition);
 
             // Define password credentials
             $passwordCredentialsDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.password_credentials.%s', $clientName);
-            $passwordCredentialsDefinition = new Definition(PasswordCredentials::class);
+            $passwordCredentialsDefinition = new Definition($config['grant_type']);
             $passwordCredentialsDefinition->addArgument(new Reference($oauthClientDefinitionName));
             $passwordCredentialsDefinition->addArgument($middlewareConfig);
             $container->setDefinition($passwordCredentialsDefinitionName, $passwordCredentialsDefinition);
@@ -98,6 +98,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                 ->scalarNode('client_secret')->defaultNull()->end()
                 ->scalarNode('token_url')->defaultNull()->end()
                 ->scalarNode('scope')->defaultNull()->end()
+                ->scalarNode('grant_type')->defaultValue(PasswordCredentials::class)->end()
             ->end();
     }
 

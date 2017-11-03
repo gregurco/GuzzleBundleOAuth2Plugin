@@ -61,6 +61,7 @@ eight_points_guzzle:
                     client_id:      "test-client-id"
                     client_secret:  "test-client-secret"
                     scope:          "administration"
+                    grant_type:     "Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials" # optional
 ```
 
 ## License
