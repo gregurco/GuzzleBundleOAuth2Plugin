@@ -87,6 +87,29 @@ eight_points_guzzle:
                     grant_type:     "Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials"
 ```
 
+#### With client credentials in body
+``` yaml
+# app/config/config.yml
+
+eight_points_guzzle:
+    clients:
+        api_payment:
+            base_url: "http://api.domain.tld"
+            
+            auth: oauth2
+
+            # plugin settings
+            plugin:
+                oauth2:
+                    base_uri:       "http://om.dev"
+                    token_url:      "/app_dev.php/oauth"
+                    client_id:      "test-client-id"
+                    client_secret:  "test-client-secret" # optional
+                    scope:          "administration"
+                    grant_type:     "Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials"
+                    auth_location:  "body"
+```
+
 See more information about middleware [here][3].
 
 ## License
