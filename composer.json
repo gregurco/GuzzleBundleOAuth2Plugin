@@ -26,7 +26,7 @@
         "symfony/config":                   "~2.3|~3.0",
         "symfony/dependency-injection":     "~2.3|~3.0",
         "symfony/expression-language":      "~2.3|~3.0",
-        "sainsburys/guzzle-oauth2-plugin":  "^3.0"
+        "sainsburys/guzzle-oauth2-plugin":  "^3.0.5"
     },
 
     "require-dev": {
