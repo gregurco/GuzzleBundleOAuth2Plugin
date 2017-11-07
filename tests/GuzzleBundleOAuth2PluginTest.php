@@ -90,6 +90,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'client_id' => 'test-client-id',
                 'client_secret' => '',
                 'scope' => 'administration',
+                'resource' => null,
                 'auth_location' => 'headers',
                 'grant_type' => PasswordCredentials::class,
             ],
