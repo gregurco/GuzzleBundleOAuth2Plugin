@@ -50,6 +50,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'client_secret' => null,
                 'token_url' => null,
                 'scope' => null,
+                'resource' => null,
                 'auth_location' => 'headers',
                 'grant_type' => PasswordCredentials::class,
             ],
