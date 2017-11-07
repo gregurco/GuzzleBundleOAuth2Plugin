@@ -42,6 +42,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                 PasswordCredentials::CONFIG_CLIENT_ID => $config['client_id'],
                 PasswordCredentials::CONFIG_CLIENT_SECRET => $config['client_secret'],
                 PasswordCredentials::CONFIG_TOKEN_URL => $config['token_url'],
+                PasswordCredentials::CONFIG_AUTH_LOCATION => $config['auth_location'],
                 'scope' => $config['scope'],
             ];
 
@@ -98,6 +99,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                 ->scalarNode('client_secret')->defaultNull()->end()
                 ->scalarNode('token_url')->defaultNull()->end()
                 ->scalarNode('scope')->defaultNull()->end()
+                ->scalarNode('auth_location')->defaultValue('headers')->end()
                 ->scalarNode('grant_type')->defaultValue(PasswordCredentials::class)->end()
             ->end();
     }
