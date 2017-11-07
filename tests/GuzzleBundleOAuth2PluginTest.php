@@ -50,6 +50,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'client_secret' => null,
                 'token_url' => null,
                 'scope' => null,
+                'auth_location' => 'headers',
                 'grant_type' => PasswordCredentials::class,
             ],
             $node->getDefaultValue()
@@ -89,6 +90,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'client_id' => 'test-client-id',
                 'client_secret' => '',
                 'scope' => 'administration',
+                'auth_location' => 'headers',
                 'grant_type' => PasswordCredentials::class,
             ],
             $container, 'api_payment', $handler
