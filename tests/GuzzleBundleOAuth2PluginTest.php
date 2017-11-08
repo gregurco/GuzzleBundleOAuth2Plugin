@@ -2,11 +2,13 @@
 
 namespace Gregurco\Bundle\GuzzleBundleOAuth2Plugin\Test;
 
+use EightPoints\Bundle\GuzzleBundle\DependencyInjection\Configuration;
 use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
 use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GuzzleBundleOAuth2Plugin;
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
 use Sainsburys\Guzzle\Oauth2\Middleware\OAuthMiddleware;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -103,5 +105,46 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
 
         $clientMiddlewareDefinition = $container->getDefinition('guzzle_bundle_oauth2_plugin.middleware.api_payment');
         $this->assertCount(3, $clientMiddlewareDefinition->getArguments());
+    }
+
+    /**
+     * @dataProvider provideValidConfigurationData
+     *
+     * @param array $pluginConfiguration
+     */
+    public function testAddConfigurationWithData(array $pluginConfiguration)
+    {
+        $config = [
+            'eight_points_guzzle' => [
+                'clients' => [
+                    'test_client' => [
+                        'plugin' => [
+                            'oauth2' => $pluginConfiguration,
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $processor = new Processor();
+        $processedConfig = $processor->processConfiguration(new Configuration('eight_points_guzzle', false, [new GuzzleBundleOAuth2Plugin()]), $config);
+
+        $this->assertInternalType('array', $processedConfig);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideValidConfigurationData() : array
+    {
+        return [
+            'plugin config is empty' => [[]],
+            'plugin is disabled' => [[
+                'enabled' => false,
+            ]],
+            'plugin is enabled' => [[
+                'enabled' => true,
+            ]],
+        ];
     }
 }
