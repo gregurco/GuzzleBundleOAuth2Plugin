@@ -120,9 +120,10 @@ eight_points_guzzle:
 | client_secret | The client secret | 7Fjfp0ZBr1KtDRbnfVdmIw |
 | username | The resource owner username | johndoe |
 | password | The resource owner password | A3ddj3w |
-| auth_location | The place where to put client_id and client_secret in auth request. | body |
+| auth_location | The place where to put client_id and client_secret in auth request. Default: headers. Allowed values: body, headers. | body |
 | resource | The App ID URI of the web API (secured resource) | https://service.contoso.com/ |
 | scope | One or more scope values indicating which parts of the user's account you wish to access | administration |
+| grant_type | Grant type class path. Class should implement `Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface`. Default: `Sainsburys\\Guzzle\\Oauth2\\GrantType\\PasswordCredentials` | `Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials` |
 
 See more information about middleware [here][3].
 

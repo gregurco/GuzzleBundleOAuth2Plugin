@@ -5,6 +5,7 @@ namespace Gregurco\Bundle\GuzzleBundleOAuth2Plugin;
 
 use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\DependencyInjection\GuzzleBundleOAuth2Extension;
 use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
+use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface;
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -101,8 +102,22 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                 ->scalarNode('token_url')->defaultNull()->end()
                 ->scalarNode('scope')->defaultNull()->end()
                 ->scalarNode('resource')->defaultNull()->end()
-                ->scalarNode('auth_location')->defaultValue('headers')->end()
-                ->scalarNode('grant_type')->defaultValue(PasswordCredentials::class)->end()
+                ->scalarNode('auth_location')
+                    ->defaultValue('headers')
+                    ->validate()
+                        ->ifNotInArray(['headers', 'body'])
+                        ->thenInvalid('Invalid auth_location %s. Allowed values: headers, body.')
+                    ->end()
+                ->end()
+                ->scalarNode('grant_type')
+                    ->defaultValue(PasswordCredentials::class)
+                    ->validate()
+                        ->ifTrue(function ($v) {
+                            return !is_subclass_of($v, GrantTypeInterface::class);
+                        })
+                        ->thenInvalid(sprintf('Use instance of %s in grant_type', GrantTypeInterface::class))
+                    ->end()
+                ->end()
             ->end();
     }
 

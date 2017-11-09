@@ -5,9 +5,12 @@ namespace Gregurco\Bundle\GuzzleBundleOAuth2Plugin\Test;
 use EightPoints\Bundle\GuzzleBundle\DependencyInjection\Configuration;
 use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
 use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GuzzleBundleOAuth2Plugin;
+use Sainsburys\Guzzle\Oauth2\GrantType\ClientCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
+use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
 use Sainsburys\Guzzle\Oauth2\Middleware\OAuthMiddleware;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -138,12 +141,73 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
     public function provideValidConfigurationData() : array
     {
         return [
-            'plugin config is empty' => [[]],
+            'config is empty' => [[]],
             'plugin is disabled' => [[
                 'enabled' => false,
             ]],
             'plugin is enabled' => [[
                 'enabled' => true,
+            ]],
+            'PasswordCredentials in grant_type' => [[
+                'grant_type' => PasswordCredentials::class,
+            ]],
+            'ClientCredentials in grant_type' => [[
+                'grant_type' => ClientCredentials::class,
+            ]],
+            'JwtBearer in grant_type' => [[
+                'grant_type' => ClientCredentials::class,
+            ]],
+            'RefreshToken in grant_type' => [[
+                'grant_type' => RefreshToken::class,
+            ]],
+            'headers in auth_location' => [[
+                'auth_location' => 'headers',
+            ]],
+            'body in auth_location' => [[
+                'auth_location' => 'body',
+            ]],
+        ];
+    }
+
+    /**
+     * @dataProvider provideInvalidConfigurationData
+     *
+     * @param array $pluginConfiguration
+     */
+    public function testAddConfigurationWithInvalidData(array $pluginConfiguration)
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        $config = [
+            'eight_points_guzzle' => [
+                'clients' => [
+                    'test_client' => [
+                        'plugin' => [
+                            'oauth2' => $pluginConfiguration,
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $processor = new Processor();
+        $processor->processConfiguration(new Configuration('eight_points_guzzle', false, [new GuzzleBundleOAuth2Plugin()]), $config);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideInvalidConfigurationData() : array
+    {
+        return [
+            'invalid type in grant_type' => [[
+                'grant_type' => true,
+            ]],
+            'invalid class in grant_type' => [[
+                'grant_type' => \stdClass::class,
+            ]],
+            'invalid grant_type' => [[
+                'auth_location' => 'somewhere',
             ]],
         ];
     }
