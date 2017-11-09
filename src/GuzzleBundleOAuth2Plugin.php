@@ -5,7 +5,10 @@ namespace Gregurco\Bundle\GuzzleBundleOAuth2Plugin;
 
 use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\DependencyInjection\GuzzleBundleOAuth2Extension;
 use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
+use Sainsburys\Guzzle\Oauth2\GrantType\ClientCredentials;
+use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeBase;
 use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface;
+use Sainsburys\Guzzle\Oauth2\GrantType\JwtBearer;
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -40,13 +43,24 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
             $middlewareConfig = [
                 PasswordCredentials::CONFIG_USERNAME => $config['username'],
                 PasswordCredentials::CONFIG_PASSWORD => $config['password'],
-                PasswordCredentials::CONFIG_CLIENT_ID => $config['client_id'],
-                PasswordCredentials::CONFIG_CLIENT_SECRET => $config['client_secret'],
-                PasswordCredentials::CONFIG_TOKEN_URL => $config['token_url'],
-                PasswordCredentials::CONFIG_AUTH_LOCATION => $config['auth_location'],
-                PasswordCredentials::CONFIG_RESOURCE => $config['resource'],
+                GrantTypeBase::CONFIG_CLIENT_ID => $config['client_id'],
+                GrantTypeBase::CONFIG_CLIENT_SECRET => $config['client_secret'],
+                GrantTypeBase::CONFIG_TOKEN_URL => $config['token_url'],
+                GrantTypeBase::CONFIG_AUTH_LOCATION => $config['auth_location'],
+                GrantTypeBase::CONFIG_RESOURCE => $config['resource'],
+                JwtBearer::CONFIG_PRIVATE_KEY => null,
                 'scope' => $config['scope'],
             ];
+
+            if ($config['private_key']) {
+                // Define Client
+                $privateKeyDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.private_key.%s', $clientName);
+                $privateKeyDefinition = new Definition(\SplFileObject::class);
+                $privateKeyDefinition->addArgument($config['private_key']);
+                $container->setDefinition($privateKeyDefinitionName, $privateKeyDefinition);
+
+                $middlewareConfig[JwtBearer::CONFIG_PRIVATE_KEY] = new Reference($privateKeyDefinitionName);
+            }
 
             // Define Client
             $oauthClientDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.client.%s', $clientName);
@@ -93,6 +107,34 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
     {
         $pluginNode
             ->canBeEnabled()
+            ->validate()
+                ->ifTrue(function (array $config) {
+                    return $config['enabled'] === true && empty($config['base_uri']);
+                })
+                ->thenInvalid('base_uri is required')
+            ->end()
+            ->validate()
+                ->ifTrue(function (array $config) {
+                    return $config['enabled'] === true && empty($config['client_id']);
+                })
+                ->thenInvalid('client_id is required')
+            ->end()
+            ->validate()
+                ->ifTrue(function (array $config) {
+                    return $config['enabled'] === true &&
+                        $config['grant_type'] === PasswordCredentials::class &&
+                        (empty($config['username']) || empty($config['password']));
+                })
+                ->thenInvalid('username and password are required')
+            ->end()
+            ->validate()
+                ->ifTrue(function (array $config) {
+                    return $config['enabled'] === true &&
+                        $config['grant_type'] === JwtBearer::class &&
+                        empty($config['private_key']);
+                })
+                ->thenInvalid('private_key is required')
+            ->end()
             ->children()
                 ->scalarNode('base_uri')->defaultNull()->end()
                 ->scalarNode('username')->defaultNull()->end()
@@ -102,6 +144,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                 ->scalarNode('token_url')->defaultNull()->end()
                 ->scalarNode('scope')->defaultNull()->end()
                 ->scalarNode('resource')->defaultNull()->end()
+                ->scalarNode('private_key')->defaultNull()->end()
                 ->scalarNode('auth_location')
                     ->defaultValue('headers')
                     ->validate()
@@ -110,7 +153,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                     ->end()
                 ->end()
                 ->scalarNode('grant_type')
-                    ->defaultValue(PasswordCredentials::class)
+                    ->defaultValue(ClientCredentials::class)
                     ->validate()
                         ->ifTrue(function ($v) {
                             return !is_subclass_of($v, GrantTypeInterface::class);

@@ -43,29 +43,7 @@ new EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundle([
 ```
 
 ### Basic configuration
-#### With password grant type
-``` yaml
-# app/config/config.yml
-
-eight_points_guzzle:
-    clients:
-        api_payment:
-            base_url: "http://api.domain.tld"
-            
-            auth: oauth2
-
-            # plugin settings
-            plugin:
-                oauth2:
-                    base_uri:       "https://example.com"
-                    token_url:      "/oauth/token"
-                    username:       "test@example.com"
-                    password:       "pa55w0rd"
-                    client_id:      "test-client-id"
-                    scope:          "administration"
-```
-
-#### With client credentials grant type
+#### With default grant type (client)
 ``` yaml
 # app/config/config.yml
 
@@ -84,7 +62,29 @@ eight_points_guzzle:
                     client_id:      "test-client-id"
                     client_secret:  "test-client-secret" # optional
                     scope:          "administration"
-                    grant_type:     "Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials"
+```
+
+#### With password grant type
+``` yaml
+# app/config/config.yml
+
+eight_points_guzzle:
+    clients:
+        api_payment:
+            base_url: "http://api.domain.tld"
+            
+            auth: oauth2
+
+            # plugin settings
+            plugin:
+                oauth2:
+                    base_uri:       "https://example.com"
+                    token_url:      "/oauth/token"
+                    client_id:      "test-client-id"
+                    username:       "johndoe"
+                    password:       "A3ddj3w"
+                    scope:          "administration"
+                    grant_type:     "Sainsburys\\Guzzle\\Oauth2\\GrantType\\PasswordCredentials"
 ```
 
 #### With client credentials in body
@@ -104,9 +104,7 @@ eight_points_guzzle:
                     base_uri:       "https://example.com"
                     token_url:      "/oauth/token"
                     client_id:      "test-client-id"
-                    client_secret:  "test-client-secret" # optional
                     scope:          "administration"
-                    grant_type:     "Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials"
                     auth_location:  "body"
 ```
 
@@ -122,8 +120,9 @@ eight_points_guzzle:
 | password | The resource owner password | for PasswordCredentials grant type | A3ddj3w |
 | auth_location | The place where to put client_id and client_secret in auth request. <br/>Default: headers. Allowed values: body, headers. | no | body |
 | resource | The App ID URI of the web API (secured resource) | no | https://service.contoso.com/ |
+| private_key | Path to private key | for JwtBearer grant type | `"%kernel.root_dir%/path/to/private.key"` |
 | scope | One or more scope values indicating which parts of the user's account you wish to access | no | administration |
-| grant_type | Grant type class path. Class should implement GrantTypeInterface. <br/> Default: `Sainsburys\\Guzzle\\Oauth2\\GrantType\\PasswordCredentials` | no | `Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials` |
+| grant_type | Grant type class path. Class should implement GrantTypeInterface. <br/> Default: `Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials` | no | `Sainsburys\\Guzzle\\Oauth2\\GrantType\\PasswordCredentials`<br/>`Sainsburys\\Guzzle\\Oauth2\\GrantType\\AuthorizationCode`<br/>`Sainsburys\\Guzzle\\Oauth2\\GrantType\\JwtBearer` |
 
 See more information about middleware [here][3].
 

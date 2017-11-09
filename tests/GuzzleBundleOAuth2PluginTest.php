@@ -6,6 +6,8 @@ use EightPoints\Bundle\GuzzleBundle\DependencyInjection\Configuration;
 use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
 use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GuzzleBundleOAuth2Plugin;
 use Sainsburys\Guzzle\Oauth2\GrantType\ClientCredentials;
+use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface;
+use Sainsburys\Guzzle\Oauth2\GrantType\JwtBearer;
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
 use Sainsburys\Guzzle\Oauth2\Middleware\OAuthMiddleware;
@@ -56,8 +58,9 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'token_url' => null,
                 'scope' => null,
                 'resource' => null,
+                'private_key' => null,
                 'auth_location' => 'headers',
-                'grant_type' => PasswordCredentials::class,
+                'grant_type' => ClientCredentials::class,
             ],
             $node->getDefaultValue()
         );
@@ -91,14 +94,15 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'enabled' => true,
                 'base_uri' => 'https://example.com',
                 'token_url' => '/oauth/token',
-                'username' => 'test@example.com',
-                'password' => 'pa55w0rd',
+                'username' => null,
+                'password' => null,
                 'client_id' => 'test-client-id',
                 'client_secret' => '',
                 'scope' => 'administration',
                 'resource' => null,
+                'private_key' => null,
                 'auth_location' => 'headers',
-                'grant_type' => PasswordCredentials::class,
+                'grant_type' => ClientCredentials::class,
             ],
             $container, 'api_payment', $handler
         );
@@ -108,6 +112,41 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
 
         $clientMiddlewareDefinition = $container->getDefinition('guzzle_bundle_oauth2_plugin.middleware.api_payment');
         $this->assertCount(3, $clientMiddlewareDefinition->getArguments());
+    }
+
+    public function testLoadForClientWithPrivateKey()
+    {
+        $handler = new Definition();
+        $container = new ContainerBuilder();
+
+        $this->plugin->loadForClient(
+            [
+                'enabled' => true,
+                'base_uri' => 'https://example.com',
+                'token_url' => '/oauth/token',
+                'username' => null,
+                'password' => null,
+                'client_id' => 'test-client-id',
+                'client_secret' => '',
+                'scope' => 'administration',
+                'resource' => null,
+                'private_key' => '/path/to/private.key',
+                'auth_location' => 'headers',
+                'grant_type' => JwtBearer::class,
+            ],
+            $container, 'api_payment', $handler
+        );
+
+        $this->assertTrue($container->hasDefinition('guzzle_bundle_oauth2_plugin.middleware.api_payment'));
+        $this->assertCount(2, $handler->getMethodCalls());
+
+        $clientMiddlewareDefinition = $container->getDefinition('guzzle_bundle_oauth2_plugin.middleware.api_payment');
+        $this->assertCount(3, $clientMiddlewareDefinition->getArguments());
+
+        $this->assertTrue($container->hasDefinition('guzzle_bundle_oauth2_plugin.private_key.api_payment'));
+        $clientMiddlewareDefinition = $container->getDefinition('guzzle_bundle_oauth2_plugin.private_key.api_payment');
+        $this->assertCount(1, $clientMiddlewareDefinition->getArguments());
+        $this->assertEquals('/path/to/private.key', $clientMiddlewareDefinition->getArgument(0));
     }
 
     /**
@@ -141,29 +180,45 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
     public function provideValidConfigurationData() : array
     {
         return [
-            'config is empty' => [[]],
             'plugin is disabled' => [[
                 'enabled' => false,
             ]],
             'plugin is enabled' => [[
                 'enabled' => true,
+                'base_uri' => 'https://example.com',
+                'client_id' => 's6BhdRkqt3',
             ]],
             'PasswordCredentials in grant_type' => [[
+                'base_uri' => 'https://example.com',
+                'client_id' => 's6BhdRkqt3',
+                'username' => 'johndoe',
+                'password' => 'A3ddj3w',
                 'grant_type' => PasswordCredentials::class,
             ]],
             'ClientCredentials in grant_type' => [[
-                'grant_type' => ClientCredentials::class,
-            ]],
-            'JwtBearer in grant_type' => [[
+                'base_uri' => 'https://example.com',
+                'client_id' => 's6BhdRkqt3',
                 'grant_type' => ClientCredentials::class,
             ]],
             'RefreshToken in grant_type' => [[
+                'base_uri' => 'https://example.com',
+                'client_id' => 's6BhdRkqt3',
                 'grant_type' => RefreshToken::class,
             ]],
+            'JwtBearer in grant_type' => [[
+                'base_uri' => 'https://example.com',
+                'client_id' => 's6BhdRkqt3',
+                'private_key' => '/path/to/private/key',
+                'grant_type' => JwtBearer::class,
+            ]],
             'headers in auth_location' => [[
+                'base_uri' => 'https://example.com',
+                'client_id' => 's6BhdRkqt3',
                 'auth_location' => 'headers',
             ]],
             'body in auth_location' => [[
+                'base_uri' => 'https://example.com',
+                'client_id' => 's6BhdRkqt3',
                 'auth_location' => 'body',
             ]],
         ];
@@ -173,10 +228,12 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
      * @dataProvider provideInvalidConfigurationData
      *
      * @param array $pluginConfiguration
+     * @param string $message
      */
-    public function testAddConfigurationWithInvalidData(array $pluginConfiguration)
+    public function testAddConfigurationWithInvalidData(array $pluginConfiguration, string $message)
     {
         $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($message);
 
         $config = [
             'eight_points_guzzle' => [
@@ -200,15 +257,70 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
     public function provideInvalidConfigurationData() : array
     {
         return [
-            'invalid type in grant_type' => [[
-                'grant_type' => true,
-            ]],
-            'invalid class in grant_type' => [[
-                'grant_type' => \stdClass::class,
-            ]],
-            'invalid grant_type' => [[
-                'auth_location' => 'somewhere',
-            ]],
+            'without base_uri' => [
+                'config' => [
+                    'enabled' => true,
+                    'client_id' => 's6BhdRkqt3',
+                ],
+                'exception message' => 'base_uri is required',
+            ],
+            'without client_id' => [
+                'config' => [
+                    'enabled' => true,
+                    'base_uri' => 'https://example.com',
+                ],
+                'exception message' => 'client_id is required',
+            ],
+            'invalid type in grant_type' => [
+                'config' => [
+                    'base_uri' => 'https://example.com',
+                    'client_id' => 's6BhdRkqt3',
+                    'grant_type' => true,
+                ],
+                'exception message' => sprintf('Use instance of %s in grant_type', GrantTypeInterface::class),
+            ],
+            'invalid class in grant_type' => [
+                'config' => [
+                    'base_uri' => 'https://example.com',
+                    'client_id' => 's6BhdRkqt3',
+                    'grant_type' => \stdClass::class,
+                ],
+                'exception message' => sprintf('Use instance of %s in grant_type', GrantTypeInterface::class),
+            ],
+            'invalid auth_location' => [
+                'config' => [
+                    'base_uri' => 'https://example.com',
+                    'client_id' => 's6BhdRkqt3',
+                    'auth_location' => 'somewhere',
+                ],
+                'exception message' => 'Invalid auth_location "somewhere". Allowed values: headers, body.',
+            ],
+            'PasswordCredentials grant type without username' => [
+                'config' => [
+                    'base_uri' => 'https://example.com',
+                    'client_id' => 's6BhdRkqt3',
+                    'password' => 'A3ddj3w',
+                    'grant_type' => PasswordCredentials::class,
+                ],
+                'exception message' => 'username and password are required',
+            ],
+            'PasswordCredentials grant type without password' => [
+                'config' => [
+                    'base_uri' => 'https://example.com',
+                    'client_id' => 's6BhdRkqt3',
+                    'username' => 'johndoe',
+                    'grant_type' => PasswordCredentials::class,
+                ],
+                'exception message' => 'username and password are required',
+            ],
+            'JwtBearer grant type without private_key' => [
+                'config' => [
+                    'base_uri' => 'https://example.com',
+                    'client_id' => 's6BhdRkqt3',
+                    'grant_type' => JwtBearer::class,
+                ],
+                'exception message' => 'private_key is required',
+            ],
         ];
     }
 }
