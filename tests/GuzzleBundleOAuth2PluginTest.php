@@ -7,6 +7,7 @@ use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
 use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GuzzleBundleOAuth2Plugin;
 use Sainsburys\Guzzle\Oauth2\GrantType\ClientCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface;
+use Sainsburys\Guzzle\Oauth2\GrantType\JwtBearer;
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
 use Sainsburys\Guzzle\Oauth2\Middleware\OAuthMiddleware;
@@ -57,6 +58,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'token_url' => null,
                 'scope' => null,
                 'resource' => null,
+                'private_key' => null,
                 'auth_location' => 'headers',
                 'grant_type' => ClientCredentials::class,
             ],
@@ -98,6 +100,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'client_secret' => '',
                 'scope' => 'administration',
                 'resource' => null,
+                'private_key' => null,
                 'auth_location' => 'headers',
                 'grant_type' => ClientCredentials::class,
             ],
@@ -162,15 +165,16 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'client_id' => 's6BhdRkqt3',
                 'grant_type' => ClientCredentials::class,
             ]],
-            'JwtBearer in grant_type' => [[
-                'base_uri' => 'https://example.com',
-                'client_id' => 's6BhdRkqt3',
-                'grant_type' => ClientCredentials::class,
-            ]],
             'RefreshToken in grant_type' => [[
                 'base_uri' => 'https://example.com',
                 'client_id' => 's6BhdRkqt3',
                 'grant_type' => RefreshToken::class,
+            ]],
+            'JwtBearer in grant_type' => [[
+                'base_uri' => 'https://example.com',
+                'client_id' => 's6BhdRkqt3',
+                'private_key' => '/path/to/private/key',
+                'grant_type' => JwtBearer::class,
             ]],
             'headers in auth_location' => [[
                 'base_uri' => 'https://example.com',
@@ -273,6 +277,14 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                     'grant_type' => PasswordCredentials::class,
                 ],
                 'exception message' => 'username and password are required',
+            ],
+            'JwtBearer grant type without private_key' => [
+                'config' => [
+                    'base_uri' => 'https://example.com',
+                    'client_id' => 's6BhdRkqt3',
+                    'grant_type' => JwtBearer::class,
+                ],
+                'exception message' => 'private_key is required',
             ],
         ];
     }

@@ -120,6 +120,7 @@ eight_points_guzzle:
 | password | The resource owner password | for PasswordCredentials grant type | A3ddj3w |
 | auth_location | The place where to put client_id and client_secret in auth request. <br/>Default: headers. Allowed values: body, headers. | no | body |
 | resource | The App ID URI of the web API (secured resource) | no | https://service.contoso.com/ |
+| private_key | Path to private key | for JwtBearer grant type | `"%kernel.root_dir%/path/to/private.key"` |
 | scope | One or more scope values indicating which parts of the user's account you wish to access | no | administration |
 | grant_type | Grant type class path. Class should implement GrantTypeInterface. <br/> Default: `Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials` | no | `Sainsburys\\Guzzle\\Oauth2\\GrantType\\PasswordCredentials`<br/>`Sainsburys\\Guzzle\\Oauth2\\GrantType\\AuthorizationCode`<br/>`Sainsburys\\Guzzle\\Oauth2\\GrantType\\JwtBearer` |
 
