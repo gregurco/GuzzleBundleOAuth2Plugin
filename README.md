@@ -79,8 +79,8 @@ eight_points_guzzle:
             # plugin settings
             plugin:
                 oauth2:
-                    base_uri:       "http://om.dev"
-                    token_url:      "/app_dev.php/oauth"
+                    base_uri:       "https://example.com"
+                    token_url:      "/oauth/token"
                     client_id:      "test-client-id"
                     client_secret:  "test-client-secret" # optional
                     scope:          "administration"
@@ -101,14 +101,29 @@ eight_points_guzzle:
             # plugin settings
             plugin:
                 oauth2:
-                    base_uri:       "http://om.dev"
-                    token_url:      "/app_dev.php/oauth"
+                    base_uri:       "https://example.com"
+                    token_url:      "/oauth/token"
                     client_id:      "test-client-id"
                     client_secret:  "test-client-secret" # optional
                     scope:          "administration"
                     grant_type:     "Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials"
                     auth_location:  "body"
 ```
+
+### Options
+
+| Key | Description | Required | Example |
+| --- | --- | --- | --- |
+| base_uri | URL of oAuth2 server.| yes | https://example.com |
+| token_url | The path that will be concatenated with base_uri. <br/>Default: `/oauth2/token`| no | /oauth/token |
+| client_id | The client identifier issued to the client during the registration process | yes | s6BhdRkqt3 |
+| client_secret | The client secret | no | 7Fjfp0ZBr1KtDRbnfVdmIw |
+| username | The resource owner username | for PasswordCredentials grant type | johndoe |
+| password | The resource owner password | for PasswordCredentials grant type | A3ddj3w |
+| auth_location | The place where to put client_id and client_secret in auth request. <br/>Default: headers. Allowed values: body, headers. | no | body |
+| resource | The App ID URI of the web API (secured resource) | no | https://service.contoso.com/ |
+| scope | One or more scope values indicating which parts of the user's account you wish to access | no | administration |
+| grant_type | Grant type class path. Class should implement GrantTypeInterface. <br/> Default: `Sainsburys\\Guzzle\\Oauth2\\GrantType\\PasswordCredentials` | no | `Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials` |
 
 See more information about middleware [here][3].
 
