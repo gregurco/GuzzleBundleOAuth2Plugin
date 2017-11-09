@@ -5,6 +5,7 @@ namespace Gregurco\Bundle\GuzzleBundleOAuth2Plugin;
 
 use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\DependencyInjection\GuzzleBundleOAuth2Extension;
 use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
+use Sainsburys\Guzzle\Oauth2\GrantType\ClientCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface;
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
@@ -93,6 +94,26 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
     {
         $pluginNode
             ->canBeEnabled()
+            ->validate()
+                ->ifTrue(function (array $config) {
+                    return $config['enabled'] === true && empty($config['base_uri']);
+                })
+                ->thenInvalid('base_uri is required')
+            ->end()
+            ->validate()
+                ->ifTrue(function (array $config) {
+                    return $config['enabled'] === true && empty($config['client_id']);
+                })
+                ->thenInvalid('client_id is required')
+            ->end()
+            ->validate()
+                ->ifTrue(function (array $config) {
+                    return $config['enabled'] === true &&
+                        $config['grant_type'] === PasswordCredentials::class &&
+                        (empty($config['username']) || empty($config['password']));
+                })
+                ->thenInvalid('username and password are required')
+            ->end()
             ->children()
                 ->scalarNode('base_uri')->defaultNull()->end()
                 ->scalarNode('username')->defaultNull()->end()
@@ -110,7 +131,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                     ->end()
                 ->end()
                 ->scalarNode('grant_type')
-                    ->defaultValue(PasswordCredentials::class)
+                    ->defaultValue(ClientCredentials::class)
                     ->validate()
                         ->ifTrue(function ($v) {
                             return !is_subclass_of($v, GrantTypeInterface::class);
