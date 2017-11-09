@@ -114,6 +114,41 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
         $this->assertCount(3, $clientMiddlewareDefinition->getArguments());
     }
 
+    public function testLoadForClientWithPrivateKey()
+    {
+        $handler = new Definition();
+        $container = new ContainerBuilder();
+
+        $this->plugin->loadForClient(
+            [
+                'enabled' => true,
+                'base_uri' => 'https://example.com',
+                'token_url' => '/oauth/token',
+                'username' => null,
+                'password' => null,
+                'client_id' => 'test-client-id',
+                'client_secret' => '',
+                'scope' => 'administration',
+                'resource' => null,
+                'private_key' => '/path/to/private.key',
+                'auth_location' => 'headers',
+                'grant_type' => JwtBearer::class,
+            ],
+            $container, 'api_payment', $handler
+        );
+
+        $this->assertTrue($container->hasDefinition('guzzle_bundle_oauth2_plugin.middleware.api_payment'));
+        $this->assertCount(2, $handler->getMethodCalls());
+
+        $clientMiddlewareDefinition = $container->getDefinition('guzzle_bundle_oauth2_plugin.middleware.api_payment');
+        $this->assertCount(3, $clientMiddlewareDefinition->getArguments());
+
+        $this->assertTrue($container->hasDefinition('guzzle_bundle_oauth2_plugin.private_key.api_payment'));
+        $clientMiddlewareDefinition = $container->getDefinition('guzzle_bundle_oauth2_plugin.private_key.api_payment');
+        $this->assertCount(1, $clientMiddlewareDefinition->getArguments());
+        $this->assertEquals('/path/to/private.key', $clientMiddlewareDefinition->getArgument(0));
+    }
+
     /**
      * @dataProvider provideValidConfigurationData
      *

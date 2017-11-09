@@ -59,9 +59,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                 $privateKeyDefinition->addArgument($config['private_key']);
                 $container->setDefinition($privateKeyDefinitionName, $privateKeyDefinition);
 
-                $middlewareConfig += [
-                    JwtBearer::CONFIG_PRIVATE_KEY => new Reference($privateKeyDefinitionName),
-                ];
+                $middlewareConfig[JwtBearer::CONFIG_PRIVATE_KEY] = new Reference($privateKeyDefinitionName);
             }
 
             // Define Client
