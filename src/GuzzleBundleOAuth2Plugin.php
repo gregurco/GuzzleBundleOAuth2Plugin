@@ -57,6 +57,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                 $privateKeyDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.private_key.%s', $clientName);
                 $privateKeyDefinition = new Definition(\SplFileObject::class);
                 $privateKeyDefinition->addArgument($config['private_key']);
+                $privateKeyDefinition->setPublic(true);
                 $container->setDefinition($privateKeyDefinitionName, $privateKeyDefinition);
 
                 $middlewareConfig[JwtBearer::CONFIG_PRIVATE_KEY] = new Reference($privateKeyDefinitionName);
@@ -66,6 +67,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
             $oauthClientDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.client.%s', $clientName);
             $oauthClientDefinition = new Definition(Client::class);
             $oauthClientDefinition->addArgument(['base_uri' => $config['base_uri']]);
+            $oauthClientDefinition->setPublic(true);
             $container->setDefinition($oauthClientDefinitionName, $oauthClientDefinition);
 
             // Define password credentials
@@ -73,6 +75,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
             $passwordCredentialsDefinition = new Definition($config['grant_type']);
             $passwordCredentialsDefinition->addArgument(new Reference($oauthClientDefinitionName));
             $passwordCredentialsDefinition->addArgument($middlewareConfig);
+            $passwordCredentialsDefinition->setPublic(true);
             $container->setDefinition($passwordCredentialsDefinitionName, $passwordCredentialsDefinition);
 
             // Define refresh token
@@ -80,6 +83,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
             $refreshTokenDefinition = new Definition(RefreshToken::class);
             $refreshTokenDefinition->addArgument(new Reference($oauthClientDefinitionName));
             $refreshTokenDefinition->addArgument($middlewareConfig);
+            $refreshTokenDefinition->setPublic(true);
             $container->setDefinition($refreshTokenDefinitionName, $refreshTokenDefinition);
 
             //Define middleware
@@ -90,6 +94,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                 new Reference($passwordCredentialsDefinitionName),
                 new Reference($refreshTokenDefinitionName)
             ]);
+            $oAuth2MiddlewareDefinition->setPublic(true);
             $container->setDefinition($oAuth2MiddlewareDefinitionName, $oAuth2MiddlewareDefinition);
 
             $onBeforeExpression = new Expression(sprintf('service("%s").onBefore()', $oAuth2MiddlewareDefinitionName));
