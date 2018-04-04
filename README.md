@@ -52,7 +52,8 @@ eight_points_guzzle:
         api_payment:
             base_url: "http://api.domain.tld"
             
-            auth: oauth2
+            options:
+                auth: oauth2
 
             # plugin settings
             plugin:
@@ -73,7 +74,8 @@ eight_points_guzzle:
         api_payment:
             base_url: "http://api.domain.tld"
             
-            auth: oauth2
+            options:
+                auth: oauth2
 
             # plugin settings
             plugin:
@@ -96,7 +98,8 @@ eight_points_guzzle:
         api_payment:
             base_url: "http://api.domain.tld"
             
-            auth: oauth2
+            options:
+                auth: oauth2
 
             # plugin settings
             plugin:

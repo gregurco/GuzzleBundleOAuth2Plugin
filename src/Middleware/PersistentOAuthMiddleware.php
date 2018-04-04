@@ -72,7 +72,7 @@ class PersistentOAuthMiddleware extends OAuthMiddleware
     protected function restoreTokenFromSession()
     {
         if ($this->session->has($this->clientName . '_token')) {
-            $sessionTokenData = $this->session->has($this->clientName . '_token');
+            $sessionTokenData = $this->session->get($this->clientName . '_token');
 
             $this->setAccessToken(new AccessToken(
                 $sessionTokenData['token'],
