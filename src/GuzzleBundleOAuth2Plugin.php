@@ -88,12 +88,24 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
 
             //Define middleware
             $oAuth2MiddlewareDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.middleware.%s', $clientName);
-            $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.middleware.class%');
-            $oAuth2MiddlewareDefinition->setArguments([
-                new Reference($oauthClientDefinitionName),
-                new Reference($passwordCredentialsDefinitionName),
-                new Reference($refreshTokenDefinitionName)
-            ]);
+            if ($config['persistent']) {
+                $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.persistent_middleware.class%');
+                $oAuth2MiddlewareDefinition->setArguments([
+                    new Reference($oauthClientDefinitionName),
+                    new Reference($passwordCredentialsDefinitionName),
+                    new Reference($refreshTokenDefinitionName),
+                    new Reference('session'),
+                    $clientName
+                ]);
+            } else {
+                $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.middleware.class%');
+                $oAuth2MiddlewareDefinition->setArguments([
+                    new Reference($oauthClientDefinitionName),
+                    new Reference($passwordCredentialsDefinitionName),
+                    new Reference($refreshTokenDefinitionName)
+                ]);
+            }
+
             $oAuth2MiddlewareDefinition->setPublic(true);
             $container->setDefinition($oAuth2MiddlewareDefinitionName, $oAuth2MiddlewareDefinition);
 
@@ -166,6 +178,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                         ->thenInvalid(sprintf('Use instance of %s in grant_type', GrantTypeInterface::class))
                     ->end()
                 ->end()
+                ->booleanNode('persistent')->defaultFalse()->end()
             ->end();
     }
 

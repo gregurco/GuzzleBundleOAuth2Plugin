@@ -123,6 +123,7 @@ eight_points_guzzle:
 | private_key | Path to private key | for JwtBearer grant type | `"%kernel.root_dir%/path/to/private.key"` |
 | scope | One or more scope values indicating which parts of the user's account you wish to access | no | administration |
 | grant_type | Grant type class path. Class should implement GrantTypeInterface. <br/> Default: `Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials` | no | `Sainsburys\\Guzzle\\Oauth2\\GrantType\\PasswordCredentials`<br/>`Sainsburys\\Guzzle\\Oauth2\\GrantType\\AuthorizationCode`<br/>`Sainsburys\\Guzzle\\Oauth2\\GrantType\\JwtBearer` |
+| persistent | Token will be stored in session. <br/> Default: false | no | |
 
 See more information about middleware [here][3].
 
