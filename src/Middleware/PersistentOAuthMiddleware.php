@@ -37,8 +37,6 @@ class PersistentOAuthMiddleware extends OAuthMiddleware
 
         $this->session = $session;
         $this->clientName = $clientName;
-
-        $this->restoreTokenFromSession();
     }
 
     /**
@@ -67,6 +65,18 @@ class PersistentOAuthMiddleware extends OAuthMiddleware
             'data' => $token->getData(),
         ]);
         $this->session->save();
+    }
+
+    /**
+     * @return null|AccessToken
+     */
+    public function getAccessToken()
+    {
+        if ($this->accessToken === null) {
+            $this->restoreTokenFromSession();
+        }
+
+        return parent::getAccessToken();
     }
 
     protected function restoreTokenFromSession()
