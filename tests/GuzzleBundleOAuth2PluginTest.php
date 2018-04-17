@@ -61,6 +61,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'private_key' => null,
                 'auth_location' => 'headers',
                 'grant_type' => ClientCredentials::class,
+                'persistent' => false,
             ],
             $node->getDefaultValue()
         );
@@ -103,6 +104,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'private_key' => null,
                 'auth_location' => 'headers',
                 'grant_type' => ClientCredentials::class,
+                'persistent' => false,
             ],
             $container, 'api_payment', $handler
         );
@@ -133,6 +135,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'private_key' => '/path/to/private.key',
                 'auth_location' => 'headers',
                 'grant_type' => JwtBearer::class,
+                'persistent' => false,
             ],
             $container, 'api_payment', $handler
         );

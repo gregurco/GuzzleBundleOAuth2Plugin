@@ -5,5 +5,6 @@
 
     <parameters>
 		<parameter key="guzzle_bundle_oauth2_plugin.middleware.class">Sainsburys\Guzzle\Oauth2\Middleware\OAuthMiddleware</parameter>
+		<parameter key="guzzle_bundle_oauth2_plugin.persistent_middleware.class">Gregurco\Bundle\GuzzleBundleOAuth2Plugin\Middleware\PersistentOAuthMiddleware</parameter>
     </parameters>
 </container>
