@@ -11,6 +11,7 @@ use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface;
 use Sainsburys\Guzzle\Oauth2\GrantType\JwtBearer;
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -50,6 +51,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                 GrantTypeBase::CONFIG_RESOURCE => $config['resource'],
                 JwtBearer::CONFIG_PRIVATE_KEY => null,
                 'scope' => $config['scope'],
+                'audience' => $config['audience'],
             ];
 
             if ($config['private_key']) {
@@ -89,14 +91,29 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
             //Define middleware
             $oAuth2MiddlewareDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.middleware.%s', $clientName);
             if ($config['persistent']) {
-                $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.persistent_middleware.class%');
-                $oAuth2MiddlewareDefinition->setArguments([
-                    new Reference($oauthClientDefinitionName),
-                    new Reference($passwordCredentialsDefinitionName),
-                    new Reference($refreshTokenDefinitionName),
-                    new Reference('session'),
-                    $clientName
-                ]);
+                if ($config['grant_type'] === ClientCredentials::class) {
+                    $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.cached_middleware.class%');
+                    $oAuth2MiddlewareDefinition->setArguments(
+                        [
+                            new Reference($oauthClientDefinitionName),
+                            new Reference($passwordCredentialsDefinitionName),
+                            new Reference($refreshTokenDefinitionName),
+                            new Reference(AdapterInterface::class),
+                            $clientName
+                        ]
+                    );
+                } else {
+                    $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.persistent_middleware.class%');
+                    $oAuth2MiddlewareDefinition->setArguments(
+                        [
+                            new Reference($oauthClientDefinitionName),
+                            new Reference($passwordCredentialsDefinitionName),
+                            new Reference($refreshTokenDefinitionName),
+                            new Reference('session'),
+                            $clientName
+                        ]
+                    );
+                }
             } else {
                 $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.middleware.class%');
                 $oAuth2MiddlewareDefinition->setArguments([
@@ -110,7 +127,11 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
             $container->setDefinition($oAuth2MiddlewareDefinitionName, $oAuth2MiddlewareDefinition);
 
             $onBeforeExpression = new Expression(sprintf('service("%s").onBefore()', $oAuth2MiddlewareDefinitionName));
-            $onFailureExpression = new Expression(sprintf('service("%s").onFailure(5)', $oAuth2MiddlewareDefinitionName));
+            $onFailureExpression = new Expression(sprintf(
+                'service("%s").onFailure(%d)',
+                $oAuth2MiddlewareDefinitionName,
+                $config['retry_limit']
+            ));
 
             $handler->addMethodCall('push', [$onBeforeExpression]);
             $handler->addMethodCall('push', [$onFailureExpression]);
@@ -160,6 +181,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                 ->scalarNode('client_secret')->defaultNull()->end()
                 ->scalarNode('token_url')->defaultNull()->end()
                 ->scalarNode('scope')->defaultNull()->end()
+                ->scalarNode('audience')->defaultNull()->end()
                 ->scalarNode('resource')->defaultNull()->end()
                 ->scalarNode('private_key')->defaultNull()->end()
                 ->scalarNode('auth_location')
@@ -179,6 +201,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                     ->end()
                 ->end()
                 ->booleanNode('persistent')->defaultFalse()->end()
+                ->booleanNode('retry_limit')->defaultValue(5)->end()
             ->end();
     }
 
