@@ -1,11 +1,16 @@
 {
-    "name":        "gregurco/guzzle-bundle-oauth2-plugin",
+    "name":        "pm-connect/guzzle-bundle-oauth2-plugin",
     "type":        "library",
     "description": "OAuth2 Plugin for Guzzle Bundle, a PHP HTTP client library and framework for building RESTful web service clients",
     "keywords":    ["oauth2", "middleware", "plugin", "framework", "http", "rest", "web service", "curl", "client", "HTTP client"],
     "homepage":    "https://github.com/gregurco/GuzzleBundleOAuth2Plugin",
     "license":     "MIT",
 
+    "repositories": [
+        {"type": "composer", "url": "https://repo.packagist.com/pm-connect/"},
+        {"packagist.org": false}
+    ],	
+    
     "authors": [
         {
             "name":     "Gregurco Vlad",
