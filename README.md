@@ -158,6 +158,7 @@ eight_points_guzzle:
 | audience | | no | |
 | grant_type | Grant type class path. Class should implement GrantTypeInterface. <br/> Default: `Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials` | no | `Sainsburys\\Guzzle\\Oauth2\\GrantType\\PasswordCredentials`<br/>`Sainsburys\\Guzzle\\Oauth2\\GrantType\\AuthorizationCode`<br/>`Sainsburys\\Guzzle\\Oauth2\\GrantType\\JwtBearer` |
 | persistent | Token will be stored in session. <br/> Default: false | no | |
+| retry_limit | How many times request will be repeated on failure. <br/> Default: 5 | no | |
 
 See more information about middleware [here][3].
 

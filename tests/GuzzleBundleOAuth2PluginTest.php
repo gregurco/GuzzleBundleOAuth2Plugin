@@ -63,6 +63,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'auth_location' => 'headers',
                 'grant_type' => ClientCredentials::class,
                 'persistent' => false,
+                'retry_limit' => 5,
             ],
             $node->getDefaultValue()
         );
@@ -107,6 +108,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'auth_location' => 'headers',
                 'grant_type' => ClientCredentials::class,
                 'persistent' => false,
+                'retry_limit' => 5,
             ],
             $container, 'api_payment', $handler
         );
@@ -139,6 +141,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
                 'auth_location' => 'headers',
                 'grant_type' => JwtBearer::class,
                 'persistent' => false,
+                'retry_limit' => 5,
             ],
             $container, 'api_payment', $handler
         );
