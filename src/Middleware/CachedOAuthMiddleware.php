@@ -2,7 +2,6 @@
 
 namespace Gregurco\Bundle\GuzzleBundleOAuth2Plugin\Middleware;
 
-use DateInterval;
 use GuzzleHttp\ClientInterface;
 use Psr\Cache\InvalidArgumentException;
 use Sainsburys\Guzzle\Oauth2\AccessToken;
@@ -80,7 +79,11 @@ class CachedOAuthMiddleware extends OAuthMiddleware
             ]
         );
         $item->tag('oauth');
-        $item->expiresAfter(DateInterval::createFromDateString('1 hour'));
+        $expires = $token->getExpires();
+
+        if ($expires) {
+            $item->expiresAt($expires->sub(\DateInterval::createFromDateString('1 minute')));
+        }
 
         $this->cacheClient->saveDeferred($item);
     }
