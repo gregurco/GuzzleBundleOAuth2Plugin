@@ -111,7 +111,11 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
             $container->setDefinition($oAuth2MiddlewareDefinitionName, $oAuth2MiddlewareDefinition);
 
             $onBeforeExpression = new Expression(sprintf('service("%s").onBefore()', $oAuth2MiddlewareDefinitionName));
-            $onFailureExpression = new Expression(sprintf('service("%s").onFailure(5)', $oAuth2MiddlewareDefinitionName));
+            $onFailureExpression = new Expression(sprintf(
+                'service("%s").onFailure(%d)',
+                $oAuth2MiddlewareDefinitionName,
+                $config['retry_limit']
+            ));
 
             $handler->addMethodCall('push', [$onBeforeExpression]);
             $handler->addMethodCall('push', [$onFailureExpression]);
@@ -181,6 +185,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                     ->end()
                 ->end()
                 ->booleanNode('persistent')->defaultFalse()->end()
+                ->booleanNode('retry_limit')->defaultValue(5)->end()
             ->end();
     }
 

@@ -155,8 +155,10 @@ eight_points_guzzle:
 | resource | The App ID URI of the web API (secured resource) | no | https://service.contoso.com/ |
 | private_key | Path to private key | for JwtBearer grant type | `"%kernel.root_dir%/path/to/private.key"` |
 | scope | One or more scope values indicating which parts of the user's account you wish to access | no | administration |
+| audience | | no | |
 | grant_type | Grant type class path. Class should implement GrantTypeInterface. <br/> Default: `Sainsburys\\Guzzle\\Oauth2\\GrantType\\ClientCredentials` | no | `Sainsburys\\Guzzle\\Oauth2\\GrantType\\PasswordCredentials`<br/>`Sainsburys\\Guzzle\\Oauth2\\GrantType\\AuthorizationCode`<br/>`Sainsburys\\Guzzle\\Oauth2\\GrantType\\JwtBearer` |
 | persistent | Token will be stored in session. <br/> Default: false | no | |
+| retry_limit | How many times request will be repeated on failure. <br/> Default: 5 | no | |
 
 See more information about middleware [here][3].
 
