@@ -11,6 +11,7 @@ use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface;
 use Sainsburys\Guzzle\Oauth2\GrantType\JwtBearer;
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -97,7 +98,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
                             new Reference($oauthClientDefinitionName),
                             new Reference($passwordCredentialsDefinitionName),
                             new Reference($refreshTokenDefinitionName),
-                            new Reference('Symfony\Component\Cache\Adapter\AdapterInterface'),
+                            new Reference(AdapterInterface::class),
                             $clientName
                         ]
                     );

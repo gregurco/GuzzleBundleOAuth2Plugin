@@ -5,12 +5,6 @@
     "keywords":    ["oauth2", "middleware", "plugin", "framework", "http", "rest", "web service", "curl", "client", "HTTP client"],
     "homepage":    "https://github.com/gregurco/GuzzleBundleOAuth2Plugin",
     "license":     "MIT",
-
-    "repositories": [
-        {"type": "composer", "url": "https://repo.packagist.com/pm-connect/"},
-        {"packagist.org": false}
-    ],	
-    
     "authors": [
         {
             "name":     "Gregurco Vlad",

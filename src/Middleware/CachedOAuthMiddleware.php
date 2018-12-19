@@ -33,8 +33,8 @@ class CachedOAuthMiddleware extends OAuthMiddleware
      */
     public function __construct(
         ClientInterface $client,
-        ?GrantTypeInterface $grantType = null,
-        ?RefreshTokenGrantTypeInterface $refreshTokenGrantType = null,
+        GrantTypeInterface $grantType = null,
+        RefreshTokenGrantTypeInterface $refreshTokenGrantType = null,
         AdapterInterface $cacheClient,
         string $clientName
     ) {
