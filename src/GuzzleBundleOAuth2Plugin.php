@@ -11,6 +11,7 @@ use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface;
 use Sainsburys\Guzzle\Oauth2\GrantType\JwtBearer;
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\RefreshToken;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -90,14 +91,29 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
             //Define middleware
             $oAuth2MiddlewareDefinitionName = sprintf('guzzle_bundle_oauth2_plugin.middleware.%s', $clientName);
             if ($config['persistent']) {
-                $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.persistent_middleware.class%');
-                $oAuth2MiddlewareDefinition->setArguments([
-                    new Reference($oauthClientDefinitionName),
-                    new Reference($passwordCredentialsDefinitionName),
-                    new Reference($refreshTokenDefinitionName),
-                    new Reference('session'),
-                    $clientName
-                ]);
+                if ($config['grant_type'] === ClientCredentials::class) {
+                    $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.cached_middleware.class%');
+                    $oAuth2MiddlewareDefinition->setArguments(
+                        [
+                            new Reference($oauthClientDefinitionName),
+                            new Reference($passwordCredentialsDefinitionName),
+                            new Reference($refreshTokenDefinitionName),
+                            new Reference(AdapterInterface::class),
+                            $clientName
+                        ]
+                    );
+                } else {
+                    $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.persistent_middleware.class%');
+                    $oAuth2MiddlewareDefinition->setArguments(
+                        [
+                            new Reference($oauthClientDefinitionName),
+                            new Reference($passwordCredentialsDefinitionName),
+                            new Reference($refreshTokenDefinitionName),
+                            new Reference('session'),
+                            $clientName
+                        ]
+                    );
+                }
             } else {
                 $oAuth2MiddlewareDefinition = new Definition('%guzzle_bundle_oauth2_plugin.middleware.class%');
                 $oAuth2MiddlewareDefinition->setArguments([
