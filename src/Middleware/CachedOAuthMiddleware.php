@@ -71,18 +71,19 @@ class CachedOAuthMiddleware extends OAuthMiddleware
     {
         $item = $this->cacheClient->getItem(sprintf('oauth.token.%s', $this->clientName));
 
+        $expires = $token->getExpires();
+
         $item->set(
             [
                 'token' => $token->getToken(),
                 'type' => $token->getType(),
-                'data' => $token->getData(),
+                'data' => array_merge($token->getData(), ['expires' => $expires->getTimestamp()]),
             ]
         );
         $item->tag('oauth');
-        $expires = $token->getExpires();
 
         if ($expires) {
-            $item->expiresAt($expires->sub(\DateInterval::createFromDateString('1 minute')));
+            $item->expiresAt($expires->sub(\DateInterval::createFromDateString('10 seconds')));
         }
 
         $this->cacheClient->saveDeferred($item);

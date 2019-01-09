@@ -58,11 +58,13 @@ class PersistentOAuthMiddleware extends OAuthMiddleware
      */
     protected function storeTokenInSession(AccessToken $token)
     {
+        $expires = $token->getExpires();
+
         $this->session->start();
         $this->session->set($this->clientName . '_token', [
             'token' => $token->getToken(),
             'type' => $token->getType(),
-            'data' => $token->getData(),
+            'data' => array_merge($token->getData(), ['expires' => $expires->getTimestamp()]),
         ]);
         $this->session->save();
     }
