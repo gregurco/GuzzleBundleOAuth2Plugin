@@ -21,10 +21,10 @@
         "php":                              "^7.0",
         "guzzlehttp/guzzle":                "^6.0",
         "eightpoints/guzzle-bundle":        "~7.1",
-        "symfony/http-kernel":              "~2.7|~3.0|~4.0",
-        "symfony/config":                   "~2.7|~3.0|~4.0",
-        "symfony/dependency-injection":     "~2.7|~3.0|~4.0",
-        "symfony/expression-language":      "~2.7|~3.0|~4.0",
+        "symfony/http-kernel":              "~2.7|~3.0|~4.0|~5.0",
+        "symfony/config":                   "~2.7|~3.0|~4.0|~5.0",
+        "symfony/dependency-injection":     "~2.7|~3.0|~4.0|~5.0",
+        "symfony/expression-language":      "~2.7|~3.0|~4.0|~5.0",
         "sainsburys/guzzle-oauth2-plugin":  "^3.0.5"
     },
 
