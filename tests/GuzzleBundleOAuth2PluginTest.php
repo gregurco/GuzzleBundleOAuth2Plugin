@@ -3,7 +3,7 @@
 namespace Gregurco\Bundle\GuzzleBundleOAuth2Plugin\Test;
 
 use EightPoints\Bundle\GuzzleBundle\DependencyInjection\Configuration;
-use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
+use EightPoints\Bundle\GuzzleBundle\PluginInterface;
 use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GuzzleBundleOAuth2Plugin;
 use Sainsburys\Guzzle\Oauth2\GrantType\ClientCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface;
@@ -24,20 +24,20 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
     /** @var GuzzleBundleOAuth2Plugin */
     protected $plugin;
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
 
         $this->plugin = new GuzzleBundleOAuth2Plugin();
     }
 
-    public function testSubClassesOfPlugin()
+    public function testSubClassesOfPlugin() : void
     {
-        $this->assertInstanceOf(EightPointsGuzzleBundlePlugin::class, $this->plugin);
+        $this->assertInstanceOf(PluginInterface::class, $this->plugin);
         $this->assertInstanceOf(Bundle::class, $this->plugin);
     }
 
-    public function testAddConfiguration()
+    public function testAddConfiguration() : void
     {
         $arrayNode = new ArrayNodeDefinition('node');
 
@@ -69,12 +69,12 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
         );
     }
 
-    public function testGetPluginName()
+    public function testGetPluginName() : void
     {
         $this->assertEquals('oauth2', $this->plugin->getPluginName());
     }
 
-    public function testLoad()
+    public function testLoad() : void
     {
         $container = new ContainerBuilder();
 
@@ -87,7 +87,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
         );
     }
 
-    public function testLoadForClient()
+    public function testLoadForClient() : void
     {
         $handler = new Definition();
         $container = new ContainerBuilder();
@@ -120,7 +120,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
         $this->assertCount(3, $clientMiddlewareDefinition->getArguments());
     }
 
-    public function testLoadForClientWithPrivateKey()
+    public function testLoadForClientWithPrivateKey() : void
     {
         $handler = new Definition();
         $container = new ContainerBuilder();
@@ -163,7 +163,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
      *
      * @param array $pluginConfiguration
      */
-    public function testAddConfigurationWithData(array $pluginConfiguration)
+    public function testAddConfigurationWithData(array $pluginConfiguration) : void
     {
         $config = [
             'eight_points_guzzle' => [
@@ -239,7 +239,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
      * @param array $pluginConfiguration
      * @param string $message
      */
-    public function testAddConfigurationWithInvalidData(array $pluginConfiguration, string $message)
+    public function testAddConfigurationWithInvalidData(array $pluginConfiguration, string $message) : void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($message);

@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class GuzzleBundleOAuth2ExtensionTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad() : void
     {
         $container = new ContainerBuilder();
 
