@@ -1,52 +1,31 @@
 # Guzzle Bundle OAuth2 Plugin
 
-
 [![Build Status](https://travis-ci.org/gregurco/GuzzleBundleOAuth2Plugin.svg?branch=master)](https://travis-ci.org/gregurco/GuzzleBundleOAuth2Plugin)
 [![Coverage Status](https://coveralls.io/repos/gregurco/GuzzleBundleOAuth2Plugin/badge.svg?branch=master)](https://coveralls.io/r/gregurco/GuzzleBundleOAuth2Plugin)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/eba4f2e6-2c2a-4e92-85b6-c32ab3ac3aa7/mini.png)](https://insight.sensiolabs.com/projects/eba4f2e6-2c2a-4e92-85b6-c32ab3ac3aa7)
 
-This plugin integrates [OAuth2][1] functionality into Guzzle Bundle, a bundle for building RESTful web service clients.
+This plugin integrates [OAuth2][1] functionality into [Guzzle Bundle][2], a bundle for building RESTful web service clients.
 
+----
 
-## Requirements
-------------
- - PHP 7.0 or above
+## Prerequisites
+ - PHP 7.1 or above
  - [Guzzle Bundle][2]
  - [guzzle-oauth2-plugin][3]
 
- 
 ## Installation
-Using [composer][3]:
 
-##### composer.json
-``` json
-{
-    "require": {
-        "gregurco/guzzle-bundle-oauth2-plugin": "dev-master"
-    }
-}
-```
+To install this bundle, run the command below on the command line and you will get the latest stable version from [Packagist][4].
 
-##### command line
 ``` bash
-$ composer require gregurco/guzzle-bundle-oauth2-plugin
+composer require gregurco/guzzle-bundle-oauth2-plugin
 ```
 
 ## Usage
+
 ### Enable bundle
 
-#### Symfony 2.x and 3.x
-Plugin will be activated/connected through bundle constructor in `app/AppKernel.php`, like this:
-
-``` php 
-new EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundle([
-    new Gregurco\Bundle\GuzzleBundleOAuth2Plugin\GuzzleBundleOAuth2Plugin(),
-])
-```
-
-#### Symfony 4
-The registration of bundles was changed in Symfony 4 and now you have to change `src/Kernel.php` to achieve the same functionality.  
-Find next lines:
+Find next lines in `src/Kernel.php`:
 
 ```php
 foreach ($contents as $class => $envs) {
@@ -73,7 +52,9 @@ foreach ($contents as $class => $envs) {
 ```
 
 ### Basic configuration
+
 #### With default grant type (client)
+
 ``` yaml
 # app/config/config.yml
 
@@ -96,6 +77,7 @@ eight_points_guzzle:
 ```
 
 #### With password grant type
+
 ``` yaml
 # app/config/config.yml
 
@@ -120,6 +102,7 @@ eight_points_guzzle:
 ```
 
 #### With client credentials in body
+
 ``` yaml
 # app/config/config.yml
 
@@ -163,9 +146,10 @@ eight_points_guzzle:
 See more information about middleware [here][3].
 
 ## License
+
 This middleware is licensed under the MIT License - see the LICENSE file for details
 
 [1]: http://www.xml.com/pub/a/2003/12/17/dive.html
 [2]: https://github.com/8p/EightPointsGuzzleBundle
 [3]: https://github.com/Sainsburys/guzzle-oauth2-plugin
-[4]: https://getcomposer.org/
+[4]: https://packagist.org/packages/gregurco/guzzle-bundle-oauth2-plugin
