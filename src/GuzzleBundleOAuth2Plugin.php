@@ -3,8 +3,8 @@
 namespace Gregurco\Bundle\GuzzleBundleOAuth2Plugin;
 
 
+use EightPoints\Bundle\GuzzleBundle\PluginInterface;
 use Gregurco\Bundle\GuzzleBundleOAuth2Plugin\DependencyInjection\GuzzleBundleOAuth2Extension;
-use EightPoints\Bundle\GuzzleBundle\EightPointsGuzzleBundlePlugin;
 use Sainsburys\Guzzle\Oauth2\GrantType\ClientCredentials;
 use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeBase;
 use Sainsburys\Guzzle\Oauth2\GrantType\GrantTypeInterface;
@@ -20,13 +20,13 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\ExpressionLanguage\Expression;
 use GuzzleHttp\Client;
 
-class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundlePlugin
+class GuzzleBundleOAuth2Plugin extends Bundle implements PluginInterface
 {
     /**
      * @param array $configs
      * @param ContainerBuilder $container
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container) : void
     {
         $extension = new GuzzleBundleOAuth2Extension();
         $extension->load($configs, $container);
@@ -38,7 +38,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
      * @param string $clientName
      * @param Definition $handler
      */
-    public function loadForClient(array $config, ContainerBuilder $container, string $clientName, Definition $handler)
+    public function loadForClient(array $config, ContainerBuilder $container, string $clientName, Definition $handler) : void
     {
         if ($config['enabled']) {
             $middlewareConfig = [
@@ -141,7 +141,7 @@ class GuzzleBundleOAuth2Plugin extends Bundle implements EightPointsGuzzleBundle
     /**
      * @param ArrayNodeDefinition $pluginNode
      */
-    public function addConfiguration(ArrayNodeDefinition $pluginNode)
+    public function addConfiguration(ArrayNodeDefinition $pluginNode) : void
     {
         $pluginNode
             ->canBeEnabled()
