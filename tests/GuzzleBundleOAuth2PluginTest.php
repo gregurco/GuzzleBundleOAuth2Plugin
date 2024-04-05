@@ -180,7 +180,7 @@ class GuzzleBundleOAuth2PluginTest extends TestCase
         $processor = new Processor();
         $processedConfig = $processor->processConfiguration(new Configuration('eight_points_guzzle', false, [new GuzzleBundleOAuth2Plugin()]), $config);
 
-        $this->assertInternalType('array', $processedConfig);
+        $this->assertIsArray( $processedConfig);
     }
 
     /**
