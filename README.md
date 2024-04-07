@@ -9,7 +9,7 @@ This plugin integrates [OAuth2][1] functionality into [Guzzle Bundle][2], a bund
 ----
 
 ## Prerequisites
- - PHP 7.1 or above
+ - PHP 7.2 or above
  - [Guzzle Bundle][2]
  - [guzzle-oauth2-plugin][3]
 
